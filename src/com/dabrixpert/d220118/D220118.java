@@ -9,7 +9,12 @@ import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class D220118 {
 
@@ -17,33 +22,55 @@ public class D220118 {
     JFrame ui = new JFrame("Timer");
     JPanel layout = new JPanel();
     JLabel timer = new JLabel("--:--:--");
-    D220118() throws IOException {
+    String[] time;
+    int h, m, s, ms;
+    D220118() throws IOException, ParseException {
         ui.setSize(600, 300);
         layout.setBackground(new Color(40, 40, 40));
         layout.setLayout(null);
         timer.setForeground(new Color(255, 255, 255));
-        timer.setBounds(0, 0, 600, 80);
-        timer.setFont(new Font("MS Gothic", Font.PLAIN, 40));
-//        Process process = Runtime.getRuntime().exec("shutdown -s -t 300");
-//        printResults(process);
-        Thread thread = new Thread(new Runnable() {
-            @Override
+        timer.setBounds(0, 0, 600, 90);
+        timer.setFont(new Font("MS Gothic", Font.PLAIN, 90));
+
+        System.out.println("ver: 220119C");
+        time = br.readLine().split(":");
+        h = Integer.parseInt(time[0]); m = Integer.parseInt(time[1]); s = Integer.parseInt(time[2]); ms = Integer.parseInt(time[3]);
+
+        Timer t = new Timer();
+        t.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                Timer t = new Timer(0, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        timer.setText(String.valueOf(System.currentTimeMillis()));
+                ms -= 1;
+                if (ms < 0) {
+                    s--;
+                    ms=999;
+                }
+                if (s < 0) {
+                    m--;
+                    s=59;
+                }
+                if (m < 0) {
+                    h--;
+                    m = 59;
+                }
+                if (h < 0) {
+                    try {
+                        Process process = Runtime.getRuntime().exec("shutdown -s -t 0");
+                        printResults(process);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                });
-                t.start();
+                    System.exit(0);
+                }
+                timer.setText(String.format("%02d:%02d:%02d:%03d", h, m, s, ms));
             }
-        });
-        thread.run();
+        }, 0, 1);
+
         ui.add(layout);
         layout.add(timer);
         ui.setVisible(true);
         ui.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
+
     public static void printResults(Process process) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line = "";
@@ -51,7 +78,8 @@ public class D220118 {
             System.out.println(line);
         }
     }
-    public static void main(String[] args) throws IOException {
+
+    public static void main(String[] args) throws IOException, ParseException {
         new D220118();
     }
 }

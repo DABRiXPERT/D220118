@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="D220118:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/D220118_jar</output-path>
+    <root id="archive" name="D220118.jar">
+      <element id="module-output" name="D220118" />
+    </root>
+  </artifact>
+</component>
